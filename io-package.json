@@ -1,0 +1,55 @@
+{
+    "common": {
+        "name": "komoot",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "Initial DEV",
+                "de": "Entwicklung begonnen"
+            }
+        },
+        "title": "KOMOOT",
+        "titleLang": {
+            "en": "KOMOOT",
+            "de": "KOMOOT"
+        },
+        "desc": {
+            "en": "Fetch Komoot Data",
+            "de": "Komoot Daten abrufen"
+        },
+        "authors": [
+            "basti4557 <sebastian@vindicators.de>"
+        ],
+        "license": "MIT",
+        "platform": "Javascript/Node.js",
+        "mode": "daemon",
+        "compact": true,
+        "availableModes": [
+            "daemon"
+        ],
+        "schedule": "*/1 * * * *",
+        "readme": "TODO: Comming soon.",
+        "loglevel": "info",
+        "icon": "komoot.png",
+        "keywords": [
+            "komoot",
+            "bike",
+            "ride"
+        ],
+        "type": "network",
+        "plugins": {
+        },
+        "materialize": true,
+        "dependencies": [
+            {
+                "js-controller": ">=2.0.0"
+            }
+        ],
+        "connectionType": "local",
+        "dataSource": "poll",
+        "tier": 2
+    },
+    "native": {
+    },
+    "objects": []
+}
