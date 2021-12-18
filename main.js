@@ -7,6 +7,8 @@
  */
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
+//const jsdom = require("jsdom");
+
 const komootApi = require('./lib/komoot-api');
 const adapterName = require('./package.json').name.split('.').pop();
 let adapter;
@@ -14,7 +16,7 @@ let adapter;
 let timer = null;
 let stopTimer = null;
 
-function start(options) {
+function startAdapter(options) {
     options = options || {};
     Object.assign(options, {name: adapterName});
 
@@ -55,10 +57,58 @@ function stop() {
     }
 }
 
-function main(adapter) {
-    let baseUrl = 'account.komoot.com';
+async function main(adapter) {
+    adapter.log.info(adapter.config.interval);
+    await startKomootApi();
+    setTimeout(function () {
+        startKomootApi()
+    }, adapter.config.interval);
+}
 
-    setTimeout(() => {komootApi.start(baseUrl, adapter);}, 5000);
+async function startKomootApi() {
+    await checkProperties(adapter);
+
+    await komootApi.start('account.komoot.com', adapter);
+    await sleep(5000);
+    let userId = await komootApi.getUserId();
+    adapter.log.debug("Discovered User ID: " + userId);
+
+    //await synchronizeTours(userId);
+}
+
+async function synchronizeTours(userId) {
+    let domTours = await komootApi.getPage('www.komoot.de', '/user/' + userId + '/tours?type=recorded');
+    let tours = domTours.window.document.querySelectorAll('li');
+    for (const tour of tours) {
+        let tourUrl = tour.querySelector('a[data-test-id="tours_list_item_title"]');
+        if (tourUrl !== null) {
+            let tourName = tour.querySelector('a[data-test-id="tours_list_item_title"]');
+            let tourDate = tour.querySelector('span[class="tw-text-secondary"]');
+            // Tour is valid. proccessing tour.
+            adapter.log.debug(tourName + ': ' + tourUrl);
+        }
+    }
+}
+
+function sleep(milliseconds) {
+    return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+async function checkProperties(adapter) {
+    let email = adapter.config.email;
+    let password = adapter.config.password;
+    let interval = parseInt(adapter.config.interval);
+
+    if (email === '' || password === '') {
+        adapter.log.error('E-Mail and password missing. Cant fetch data, stopping.');
+        adapter.stop();
+    }
+
+    if (interval < 60000) {
+        adapter.log.warn("Interval has been set below 60000ms. Set it to 60000.");
+        adapter.config.interval = 60000;
+
+    }
 }
 
 // If started as allInOne/compact mode => return function to create instance
@@ -66,5 +116,5 @@ if (module && module.parent) {
     module.exports = start;
 } else {
     // or start the instance directly
-    start();
+    startAdapter();
 }

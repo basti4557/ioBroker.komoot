@@ -50,6 +50,32 @@
         "tier": 2
     },
     "native": {
+        "email": "",
+        "password": "",
+        "cookie": null,
+        "interval": 60000
     },
-    "objects": []
+    "instanceObjects": [
+        {
+            "_id": "system",
+            "type": "channel",
+            "common": {
+                "name": "System"
+            },
+            "native": {}
+        },
+        {
+            "_id": "system.cookie",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "Komoot Cookie",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
+            },
+            "native": {}
+        }
+    ]
 }
