@@ -18,7 +18,9 @@
     "url": "https://github.com/basti4557/ioBroker.komoot"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^2.5.0"
+    "@iobroker/adapter-core": "^2.5.0",
+    "https": "^1.0.0",
+    "jsdom": "^19.0.0"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^2.2.0",
