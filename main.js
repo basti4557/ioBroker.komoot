@@ -16,6 +16,7 @@ let adapter;
 let timer = null;
 let stopTimer = null;
 
+
 function startAdapter(options) {
     options = options || {};
     Object.assign(options, {name: adapterName});
@@ -58,34 +59,44 @@ function stop() {
 }
 
 async function main(adapter) {
-    adapter.log.info(adapter.config.interval);
     await startKomootApi();
-    setTimeout(function () {
-        startKomootApi()
-    }, adapter.config.interval);
 }
 
 async function startKomootApi() {
     await checkProperties(adapter);
 
     await komootApi.start('account.komoot.com', adapter);
-    await sleep(5000);
+    await sleep(2000);
     let userId = await komootApi.getUserId();
-    adapter.log.debug("Discovered User ID: " + userId);
+    await synchronizeTours(userId);
 
-    //await synchronizeTours(userId);
+    setTimeout(function () {
+        startKomootApi()
+    }, adapter.config.interval);
 }
 
 async function synchronizeTours(userId) {
     let domTours = await komootApi.getPage('www.komoot.de', '/user/' + userId + '/tours?type=recorded');
     let tours = domTours.window.document.querySelectorAll('li');
-    for (const tour of tours) {
+    let i = 0;
+    for (const [counter, tour] of tours.entries()) {
         let tourUrl = tour.querySelector('a[data-test-id="tours_list_item_title"]');
         if (tourUrl !== null) {
             let tourName = tour.querySelector('a[data-test-id="tours_list_item_title"]');
+            let tourId = (tourUrl + '').substring(6);
             let tourDate = tour.querySelector('span[class="tw-text-secondary"]');
             // Tour is valid. proccessing tour.
-            adapter.log.debug(tourName + ': ' + tourUrl);
+            adapter.log.debug(tourName + ': ' + tourId + '[' + i + ']');
+
+            // Last Tour
+            if (i === 0) {
+                let stateLastTourId = await komootApi.getState("info.lastTourId");
+                if (tourId !== stateLastTourId.val) {
+                    adapter.log.debug('Updated lastTourId to ' + tourId);
+                    adapter.setState('info.lastTourId', tourId, true);
+                }
+            }
+            i += 1;
         }
     }
 }
@@ -95,20 +106,24 @@ function sleep(milliseconds) {
 }
 
 async function checkProperties(adapter) {
-    let email = adapter.config.email;
-    let password = adapter.config.password;
-    let interval = parseInt(adapter.config.interval);
+    return new Promise(async (resolve, reject) => {
+        let email = adapter.config.email;
+        let password = adapter.config.password;
+        let interval = parseInt(adapter.config.interval);
 
-    if (email === '' || password === '') {
-        adapter.log.error('E-Mail and password missing. Cant fetch data, stopping.');
-        adapter.stop();
-    }
+        if (email === '' || password === '') {
+            adapter.log.error('E-Mail and password missing. Cant fetch data, stopping.');
+            adapter.stop();
+            await sleep(5000);
+        }
 
-    if (interval < 60000) {
-        adapter.log.warn("Interval has been set below 60000ms. Set it to 60000.");
-        adapter.config.interval = 60000;
+        if (interval < 60000) {
+            adapter.log.warn("Interval has been set below 60000ms. Set it to 60000.");
+            adapter.config.interval = 60000;
+        }
 
-    }
+        resolve();
+    });
 }
 
 // If started as allInOne/compact mode => return function to create instance

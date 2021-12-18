@@ -1,0 +1,92 @@
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="../../lib/css/themes/jquery-ui/redmond/jquery-ui.min.css"/>
+<script type="text/javascript" src="../../lib/js/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+<script type="text/javascript" src="../../lib/js/jquery-ui-1.10.3.full.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="../../css/adapter.css"/>
+<script type="text/javascript" src="../../js/translate.js"></script>
+<script type="text/javascript" src="../../js/adapter-settings.js"></script>
+<!-- <script type="text/javascript" src="words.js"></script> -->
+
+<script type="text/javascript">
+    var devices = [];
+
+    function setValue(id, value, onChange) {
+        var $value = $('#' + id + '.value');
+        if ($value.attr('type') === 'checkbox') {
+            $value.prop('checked', value).change(function () {
+                onChange();
+            });
+        } else {
+            $value.val(value).change(function () {
+                onChange();
+            }).keyup(function() {
+                // Check that only numbers entered
+                if ($(this).hasClass('number')) {
+                    var val = $(this).val();
+                    if (val) {
+                        var newVal = '';
+                        for (var i = 0; i < val.length; i++) {
+                            if (val[i] >= '0' && val[i] <= '9') {
+                                newVal += val[i];
+                            }
+                        }
+
+                        if (val != newVal) $(this).val(newVal);
+                    }
+                }
+
+                onChange();
+            });
+        }
+    }
+
+    // the function loadSettings has to exist ...
+    function load(settings, onChange) {
+        if (!settings) return;
+
+        for (var key in settings) {
+            if (settings.hasOwnProperty(key)) {
+                setValue(key, settings[key], onChange);
+            }
+        }
+
+        onChange(false);
+    }
+
+    function save(callback) {
+        var obj = {};
+        $('.value').each(function () {
+            var $this = $(this);
+            if ($this.attr('type') === 'checkbox') {
+                obj[$this.attr('id')] = $this.prop('checked');
+            } else {
+                obj[$this.attr('id')] = $this.val();
+            }
+        });
+
+
+        callback(obj);
+    }
+</script>
+</head>
+<body>
+<!-- you have to put your config page in a div with id adapter-container -->
+<div id="adapter-container">
+
+    <table><tr>
+        <td><img src="komoot.png" width="64px" height="64px"></td>
+        <td style="padding-top: 20px;padding-left: 10px"><h3 class="translate">KOMOOT adapter settings</h3></td>
+    </tr></table>
+
+    <h4 class="translate">Main settings</h4>
+    <table>
+        <tr><td><label class="translate" for="email">Email:</label></td><td class="admin-icon"></td><td><input class="value number" id="email" size="6" /></td></tr>
+        <tr><td><label class="translate" for="password">Password:</label></td><td class="admin-icon"></td><td><input class="value number" id="password" size="6" /></td></tr>
+        <tr><td><label class="translate" for="interval">Interval[ms]:</label></td><td class="admin-icon"></td><td><input class="value number" id="interval" size="6" /></td></tr>
+    </table>
+</div>
+</body>
+</html>

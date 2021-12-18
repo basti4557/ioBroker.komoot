@@ -1,11 +1,11 @@
 {
     "common": {
         "name": "komoot",
-        "version": "0.0.1",
+        "version": "0.1.0",
         "news": {
-            "0.0.1": {
-                "en": "Initial DEV",
-                "de": "Entwicklung begonnen"
+            "0.1.0": {
+                "en": "Receive UserId and lastTourId. Authorize on Komoot.",
+                "de": "userId und letzte TourId abrufen. Authorisieren bei Komoot."
             }
         },
         "title": "KOMOOT",
@@ -61,6 +61,40 @@
             "type": "channel",
             "common": {
                 "name": "System"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Info"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.userId",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "User Id",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.lastTourId",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "Last Tour Id",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
             },
             "native": {}
         },
