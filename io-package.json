@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "komoot",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "news": {
             "0.2.0": {
                 "en": "Receive recorded tours and statistic data",
@@ -32,7 +32,7 @@
             "daemon"
         ],
         "schedule": "*/1 * * * *",
-        "readme": "TODO: Comming soon.",
+        "readme": "https://github.com/basti4557/ioBroker.komoot/blob/main/README.md",
         "loglevel": "info",
         "icon": "komoot.png",
         "keywords": [
@@ -124,6 +124,32 @@
                 "type": "string",
                 "read": true,
                 "write": false,
+                "def": ""
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.followers",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "Followers",
+                "type": "number",
+                "read": true,
+                "write": true,
+                "def": ""
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.following",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "Following",
+                "type": "number",
+                "read": true,
+                "write": true,
                 "def": ""
             },
             "native": {}

@@ -72,6 +72,8 @@ async function startKomootApi() {
     if (userId !== false) {
         await synchronizeTours(userId);
         await syncronizeGeneralData(userId);
+        await syncronizeFollowersFollowing(userId, 'followers');
+        await syncronizeFollowersFollowing(userId, 'following');
     }
 
     setTimeout(function () {
@@ -96,7 +98,16 @@ async function synchronizeTours(userId) {
                     distance: parseFloat(checkQuerySelector(tour.querySelector('span[data-test-id="t_distance_value"]')).innerHTML) + 'km',
                     speed: parseFloat(checkQuerySelector(tour.querySelector('span[data-test-id="t_speed_value"]')).innerHTML) + ' km/h',
                     elevationUp: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_up_value"]')).innerHTML) + 'm',
-                    elevationDown: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML) + 'm'
+                    elevationDown: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML) + 'm',
+                }
+
+                // Add Map
+                let map = tour.querySelector('div .c-background-image.tw-hidden');
+                if (map) {
+                    let dataSrc = map.getAttribute('data-src');
+                    if (dataSrc) {
+                        tourInfo.map = dataSrc.split('?')[0]
+                    }
                 }
 
                 // remove null
@@ -109,23 +120,7 @@ async function synchronizeTours(userId) {
                 // Tour is valid. proccessing tour.
                 adapter.log.debug(JSON.stringify(tourInfo));
 
-                for (const [key, value] of Object.entries(tourInfo)) {
-                    let objectName = "tours.recorded." + tourInfo.id + '.' + key;
-
-                    adapter.setObjectNotExists(objectName, {
-                        type: 'state',
-                        common: {
-                            name: key,
-                            desc: key,
-                            type: 'string',
-                            read: true,
-                            write: true
-                        },
-                        native: {}
-                    }, function(err, obj) {
-                        adapter.setState(objectName, value);
-                    });
-                }
+                insertObject(tourInfo, 'tours.recorded.');
 
                 // Last Tour
                 if (i === 0) {
@@ -138,6 +133,26 @@ async function synchronizeTours(userId) {
                 i += 1;
             }
         }
+    }
+}
+
+function insertObject(object, prefix) {
+    for (const [key, value] of Object.entries(object)) {
+        let objectName = prefix + object.id + '.' + key;
+
+        adapter.setObjectNotExists(objectName, {
+            type: 'state',
+            common: {
+                name: key,
+                desc: key,
+                type: 'string',
+                read: true,
+                write: true
+            },
+            native: {}
+        }, function (err, obj) {
+            adapter.setState(objectName, value);
+        });
     }
 }
 
@@ -158,6 +173,48 @@ async function syncronizeGeneralData(userId) {
         if (movingTime !== stateMovingTime) {
             adapter.setState("info.movingTime", movingTime, true);
         }
+    }
+}
+
+async function syncronizeFollowersFollowing(userId, urlSuffix) {
+    let domFollowerFollowing = await komootApi.getPage('www.komoot.de', '/user/' + userId + '/' + urlSuffix);
+
+    if (domFollowerFollowing !== false) {
+        let followersFollowing = domFollowerFollowing.window.document.querySelectorAll('li');
+        let counter = 0;
+        for (const [i, followerFollowing] of followersFollowing.entries()) {
+            const followerFollowingInfo = {
+                name: checkQuerySelector(followerFollowing.querySelector('a[class="c-link c-link--inherit tw-font-bold"]')).innerHTML,
+                id: (followerFollowing.querySelector('a[class="c-link c-link--inherit tw-font-bold"]') + '').substring(6),
+            };
+
+            if (followerFollowingInfo.id !== null && followerFollowingInfo.id !== '') {
+
+                // Add Profile Picture
+                let profilePic = followerFollowing.querySelector('div .c-thumbnail__img');
+                if (profilePic) {
+                    let dataSrc = profilePic.getAttribute('data-src');
+                    if (dataSrc) {
+                        followerFollowingInfo.picture = dataSrc.split('?')[0]
+                    }
+                }
+
+                // remove null
+                for (const [key, value] of Object.entries(followerFollowingInfo)) {
+                    if (value.toString().startsWith('null')) {
+                        delete followerFollowingInfo[key];
+                    }
+                }
+
+                adapter.log.debug(JSON.stringify(followerFollowingInfo));
+
+                insertObject(followerFollowingInfo, urlSuffix + '.');
+
+                counter = counter + 1;
+            }
+        }
+
+        adapter.setState("info." + urlSuffix, counter);
     }
 }
 

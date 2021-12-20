@@ -5,9 +5,15 @@
 ## Receive Komoot Tours and Informations
 
 Receive Komoot Updates like tours and other specific data.
-
+ 
 
 ## Changelog
+
+### 0.3.0 (2021-12-20)
+* (basti4557) Added tour map picture to the tour entity
+* (basti4557) Get followers
+* (basti4557) Get Following
+* (basti4557) Added general info about how many followers / following you have
 
 ### 0.2.0 (2021-12-20)
 * (basti4557) Fetch your recorded tours
