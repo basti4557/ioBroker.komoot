@@ -91,7 +91,7 @@ async function synchronizeTours(userId) {
                 let tourId = (tourUrl + '').substring(6);
                 let tourDate = tour.querySelector('span[class="tw-text-secondary"]');
                 // Tour is valid. proccessing tour.
-                adapter.log.debug(tourName + ': ' + tourId + '[' + i + ']');
+                //adapter.log.debug(tourName + ': ' + tourId + '[' + i + ']');
 
                 // Last Tour
                 if (i === 0) {
