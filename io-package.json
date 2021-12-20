@@ -1,8 +1,12 @@
 {
     "common": {
         "name": "komoot",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "news": {
+            "0.2.0": {
+                "en": "Receive recorded tours and statistic data",
+                "de": "Aufgezeichnete Touren und statistische Daten abrufen"
+            },
             "0.1.0": {
                 "en": "Receive UserId and lastTourId. Authorize on Komoot.",
                 "de": "userId und letzte TourId abrufen. Authorisieren bei Komoot."
@@ -53,7 +57,7 @@
         "email": "",
         "password": "",
         "cookie": null,
-        "interval": 60000
+        "interval": 300000
     },
     "instanceObjects": [
         {
@@ -80,7 +84,7 @@
                 "name": "User Id",
                 "type": "string",
                 "read": true,
-                "write": false,
+                "write": true,
                 "def": ""
             },
             "native": {}
@@ -91,6 +95,32 @@
             "common": {
                 "role": "text",
                 "name": "Last Tour Id",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.distance",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "Distance over all tours",
+                "type": "string",
+                "read": true,
+                "write": false,
+                "def": ""
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.movingTime",
+            "type": "state",
+            "common": {
+                "role": "text",
+                "name": "Time spent over all tours",
                 "type": "string",
                 "read": true,
                 "write": false,

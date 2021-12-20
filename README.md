@@ -5,12 +5,19 @@
 ## Receive Komoot Tours and Informations
 
 Receive Komoot Updates like tours and other specific data.
-This adapter is still in development and non production ready.
+
 
 ## Changelog
+
+### 0.2.0 (2021-12-20)
+* (basti4557) Fetch your recorded tours
+* (basti4557) Fetch your overall distance and duration
+* (basti4557) Added error handling when komoot is not available
+* (basti4557) Default syncronisation time is moved from 1 min to 5 min
+
 ### 0.1.0 (2021-12-18)
-* Authorize with email and password
-* Get your userId and lastTourId
+* (basti4557) Authorize with email and password
+* (basti4557) Get your userId and lastTourId
 
 
 ## License
