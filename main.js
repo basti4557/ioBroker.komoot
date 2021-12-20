@@ -89,14 +89,14 @@ async function synchronizeTours(userId) {
             let tourUrl = tour.querySelector('a[data-test-id="tours_list_item_title"]');
             if (tourUrl !== null) {
                 const tourInfo = {
-                    name: tour.querySelector('a[data-test-id="tours_list_item_title"]').innerHTML,
+                    name: checkQuerySelector(tour.querySelector('a[data-test-id="tours_list_item_title"]')).innerHTML,
                     id: (tourUrl + '').substring(6),
-                    date: tour.querySelector('span[class="tw-text-secondary tw-text-sm tw-mb-0"]').innerHTML,
-                    duration: tour.querySelector('span[data-test-id="t_duration_value"]').innerHTML,
-                    distance: parseFloat(tour.querySelector('span[data-test-id="t_distance_value"]').innerHTML) + 'km',
-                    speed: parseFloat(tour.querySelector('span[data-test-id="t_speed_value"]').innerHTML) + ' km/h',
-                    elevationUp: parseInt(tour.querySelector('span[data-test-id="t_elevation_up_value"]').innerHTML) + 'm',
-                    elevationDown: parseInt(tour.querySelector('span[data-test-id="t_elevation_down_value"]').innerHTML) + 'm'
+                    date: checkQuerySelector(tour.querySelector('span[class="tw-text-secondary tw-text-sm tw-mb-0"]')).innerHTML,
+                    duration: checkQuerySelector(tour.querySelector('span[data-test-id="t_duration_value"]')).innerHTML,
+                    distance: parseFloat(checkQuerySelector(tour.querySelector('span[data-test-id="t_distance_value"]')).innerHTML) + 'km',
+                    speed: parseFloat(checkQuerySelector(tour.querySelector('span[data-test-id="t_speed_value"]')).innerHTML) + ' km/h',
+                    elevationUp: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_up_value"]')).innerHTML) + 'm',
+                    elevationDown: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML) + 'm'
                 }
                 // Tour is valid. proccessing tour.
                 adapter.log.debug(JSON.stringify(tourInfo));
@@ -151,6 +151,16 @@ async function syncronizeGeneralData(userId) {
             adapter.setState("info.movingTime", movingTime, true);
         }
     }
+}
+
+function checkQuerySelector(querySelector) {
+    if (querySelector) {
+        if (querySelector.innerHTML) {
+            return querySelector;
+        }
+    }
+
+    return {innerHTML: 'null'};
 }
 
 function filterString(string) {
