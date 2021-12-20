@@ -101,7 +101,7 @@ async function synchronizeTours(userId) {
 
                 // remove null
                 for (const [key, value] of Object.entries(tourInfo)) {
-                    if (value.toString().includes('null')) {
+                    if (value.toString().startsWith('null')) {
                         delete tourInfo[key];
                     }
                 }
