@@ -71,7 +71,7 @@ async function startKomootApi() {
 
     if (userId !== false) {
         await synchronizeTours(userId);
-        await syncronizeGeneralData(userId)
+        await syncronizeGeneralData(userId);
     }
 
     setTimeout(function () {
