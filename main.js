@@ -98,6 +98,14 @@ async function synchronizeTours(userId) {
                     elevationUp: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_up_value"]')).innerHTML) + 'm',
                     elevationDown: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML) + 'm'
                 }
+
+                // remove null
+                for (const [key, value] of Object.entries(tourInfo)) {
+                    if (value.toString().includes('null')) {
+                        delete tourInfo[key];
+                    }
+                }
+
                 // Tour is valid. proccessing tour.
                 adapter.log.debug(JSON.stringify(tourInfo));
 
