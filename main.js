@@ -87,6 +87,9 @@ async function synchronizeTours(userId) {
     if (domTours !== false) {
         let tours = domTours.window.document.querySelectorAll('li');
         let i = 0;
+
+        let tourInfos = [];
+
         for (const [counter, tour] of tours.entries()) {
             let tourUrl = tour.querySelector('a[data-test-id="tours_list_item_title"]');
             if (tourUrl !== null) {
@@ -120,7 +123,9 @@ async function synchronizeTours(userId) {
                 // Tour is valid. proccessing tour.
                 adapter.log.debug(JSON.stringify(tourInfo));
 
-                insertObject(tourInfo, 'tours.recorded.');
+                insertObjectTree(tourInfo, 'tours.recorded.');
+
+                tourInfos.push(tourInfo);
 
                 // Last Tour
                 if (i === 0) {
@@ -133,10 +138,12 @@ async function synchronizeTours(userId) {
                 i += 1;
             }
         }
+
+        insertState("tours.recorded.jsonToursRecorded", JSON.stringify(tourInfos));
     }
 }
 
-function insertObject(object, prefix) {
+function insertObjectTree(object, prefix) {
     for (const [key, value] of Object.entries(object)) {
         let objectName = prefix + object.id + '.' + key;
 
@@ -151,9 +158,29 @@ function insertObject(object, prefix) {
             },
             native: {}
         }, function (err, obj) {
-            adapter.setState(objectName, value);
+            adapter.setState(objectName, value, true);
         });
     }
+}
+
+function insertState(path, value = null, type = 'string') {
+    let name = path.split('.').slice(-1)[0];
+
+    adapter.setObjectNotExists(path, {
+        type: 'state',
+        common: {
+            name: name,
+            desc: name,
+            type: type,
+            read: true,
+            write: true
+        },
+        native: {}
+    }, function (err, obj) {
+        if (value !== null) {
+            adapter.setState(path, value, true);
+        }
+    });
 }
 
 async function syncronizeGeneralData(userId) {
@@ -182,6 +209,9 @@ async function syncronizeFollowersFollowing(userId, urlSuffix) {
     if (domFollowerFollowing !== false) {
         let followersFollowing = domFollowerFollowing.window.document.querySelectorAll('li');
         let counter = 0;
+
+        let followersFollowingInfo = [];
+
         for (const [i, followerFollowing] of followersFollowing.entries()) {
             const followerFollowingInfo = {
                 name: checkQuerySelector(followerFollowing.querySelector('a[class="c-link c-link--inherit tw-font-bold"]')).innerHTML,
@@ -208,12 +238,15 @@ async function syncronizeFollowersFollowing(userId, urlSuffix) {
 
                 adapter.log.debug(JSON.stringify(followerFollowingInfo));
 
-                insertObject(followerFollowingInfo, urlSuffix + '.');
+                insertObjectTree(followerFollowingInfo, urlSuffix + '.');
+
+                followersFollowingInfo.push(followerFollowingInfo);
 
                 counter = counter + 1;
             }
         }
 
+        insertState(urlSuffix + '.json' + urlSuffix.charAt(0).toUpperCase() + urlSuffix.slice(1), JSON.stringify(followersFollowingInfo))
         adapter.setState("info." + urlSuffix, counter);
     }
 }

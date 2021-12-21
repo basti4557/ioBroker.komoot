@@ -9,6 +9,10 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.3.1 (2021-12-21)
+* (basti4557) Saving states with ack true
+* (basti4557) Followers, Following, Tours got a JSON output
+
 ### 0.3.0 (2021-12-20)
 * (basti4557) Added tour map picture to the tour entity
 * (basti4557) Get followers
