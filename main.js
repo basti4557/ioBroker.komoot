@@ -247,7 +247,7 @@ async function syncronizeFollowersFollowing(userId, urlSuffix) {
         }
 
         insertState(urlSuffix + '.json' + urlSuffix.charAt(0).toUpperCase() + urlSuffix.slice(1), JSON.stringify(followersFollowingInfo))
-        adapter.setState("info." + urlSuffix, counter);
+        adapter.setState("info." + urlSuffix, counter, true);
     }
 }
 
