@@ -9,6 +9,9 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.3.2 (2022-03-06)
+* (basti4557) Fixed datatype of info.followers and info.following
+
 ### 0.3.1 (2021-12-21)
 * (basti4557) Saving states with ack true
 * (basti4557) Followers, Following, Tours got a JSON output
