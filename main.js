@@ -186,9 +186,9 @@ function insertState(path, value = null, type = 'string') {
 async function syncronizeGeneralData(userId) {
     let domGeneral = await komootApi.getPage('www.komoot.de', '/user/' + userId);
 
-    if (domGeneral !== false) {
-        let distance = filterString(domGeneral.window.document.querySelector('p[class="css-wjkf3u"]:nth-child(2)').innerHTML);
-        let movingTime = filterString(domGeneral.window.document.querySelector('p[class="css-wjkf3u"]:nth-child(1)').innerHTML);
+    if (domGeneral !== false && domGeneral.length > 0) {
+        let distance = filterString(checkQuerySelector(domGeneral.document.querySelector('p[class="css-wjkf3u"]:nth-child(2)')).innerHTML);
+        let movingTime = filterString(checkQuerySelector(domGeneral.window.document.querySelector('p[class="css-wjkf3u"]:nth-child(1)')).innerHTML);
 
         let stateDistance = await komootApi.getState("info.distance");
         let stateMovingTime = await komootApi.getState("info.movingTime")

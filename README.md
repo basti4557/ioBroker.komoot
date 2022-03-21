@@ -9,6 +9,9 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.3.3 (2022-03-06)
+* (basti4557) Fixed crash because of general infos. (Dont work atm but at least now dont crashes anymore)
+
 ### 0.3.2 (2022-03-06)
 * (basti4557) Fixed datatype of info.followers and info.following
 
