@@ -1,7 +1,7 @@
 {
   "name": "iobroker.komoot",
   "description": "This adapter syncronizes with the komoot platform.",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "author": "basti4557 <sebastian@vindicators.de>",
   "contributors": [
     "basti4557 <sebastian@vindicators.de>"

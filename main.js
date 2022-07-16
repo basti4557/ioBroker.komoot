@@ -187,18 +187,27 @@ async function syncronizeGeneralData(userId) {
     let domGeneral = await komootApi.getPage('www.komoot.de', '/user/' + userId);
 
     if (domGeneral !== false && domGeneral.length > 0) {
-        let distance = filterString(checkQuerySelector(domGeneral.document.querySelector('p[class="css-wjkf3u"]:nth-child(2)')).innerHTML);
-        let movingTime = filterString(checkQuerySelector(domGeneral.window.document.querySelector('p[class="css-wjkf3u"]:nth-child(1)')).innerHTML);
+        let distance = checkQuerySelector(domGeneral.document.querySelector('p[class="css-np7gb1"]:nth-child(2)'));
+        let movingTime = checkQuerySelector(domGeneral.window.document.querySelector('p[class="css-np7gb1"]:nth-child(1)'));
 
-        let stateDistance = await komootApi.getState("info.distance");
-        let stateMovingTime = await komootApi.getState("info.movingTime")
+        if (distance.innerHTML !== null && movingTime.innerHTML !== null) {
+            distance = filterString(distance.innerHTML);
+            movingTime = filterString(movingTime.innerHTML);
 
-        if (distance !== stateDistance) {
-            adapter.setState("info.distance", distance, true);
-        }
+            let stateDistance = await komootApi.getState("info.distance");
+            let stateMovingTime = await komootApi.getState("info.movingTime")
 
-        if (movingTime !== stateMovingTime) {
-            adapter.setState("info.movingTime", movingTime, true);
+            if (distance !== stateDistance) {
+                adapter.setState("info.distance", distance, true);
+            }
+
+            if (movingTime !== stateMovingTime) {
+                adapter.setState("info.movingTime", movingTime, true);
+            }
+            adapter.log.debug("Fetched distance and moving time. (Distance: " + distance + " Movingtime: " + movingTime + ")");
+        } else {
+            // There was a error while selecting the css selector. Probably the css classes got changed again.
+            adapter.log.warn("Cant fetch general distance or movingtime. (Probably the css selector has been changed on the Komoot website ?)");
         }
     }
 }
