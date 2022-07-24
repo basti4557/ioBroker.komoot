@@ -139,7 +139,7 @@ async function synchronizeTours(userId) {
             }
         }
 
-        insertState("tours.recorded.jsonToursRecorded", JSON.stringify(tourInfos));
+        insertState("tours.recorded.jsonToursRecorded", JSON.stringify(tourInfos), 'json');
     }
 }
 
@@ -186,9 +186,9 @@ function insertState(path, value = null, type = 'string') {
 async function syncronizeGeneralData(userId) {
     let domGeneral = await komootApi.getPage('www.komoot.de', '/user/' + userId);
 
-    if (domGeneral !== false && domGeneral.length > 0) {
-        let distance = checkQuerySelector(domGeneral.document.querySelector('p[class="css-np7gb1"]:nth-child(2)'));
-        let movingTime = checkQuerySelector(domGeneral.window.document.querySelector('p[class="css-np7gb1"]:nth-child(1)'));
+    if (domGeneral !== false) {
+        let distance = checkQuerySelector(domGeneral.window.document.querySelectorAll('p[class="css-np7gb1"]')[0]);
+        let movingTime = checkQuerySelector(domGeneral.window.document.querySelectorAll('p[class="css-np7gb1"]')[1]);
 
         if (distance.innerHTML !== null && movingTime.innerHTML !== null) {
             distance = filterString(distance.innerHTML);
@@ -255,7 +255,7 @@ async function syncronizeFollowersFollowing(userId, urlSuffix) {
             }
         }
 
-        insertState(urlSuffix + '.json' + urlSuffix.charAt(0).toUpperCase() + urlSuffix.slice(1), JSON.stringify(followersFollowingInfo), 'number')
+        insertState(urlSuffix + '.json' + urlSuffix.charAt(0).toUpperCase() + urlSuffix.slice(1), JSON.stringify(followersFollowingInfo), 'json')
         adapter.setState("info." + urlSuffix, counter, true);
     }
 }

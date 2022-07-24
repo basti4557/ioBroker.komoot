@@ -9,6 +9,10 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.3.5 (2022-07-24)
+* (basti4557) Fixed that no user id could be fetched.
+* (basti4557) Moving time and total distance now finally works again :)
+
 ### 0.3.4 (2022-07-16)
 * (basti4557) Fixed crash because of change on there website.
 

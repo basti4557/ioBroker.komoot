@@ -1,7 +1,7 @@
 {
     "common": {
         "name": "komoot",
-        "version": "0.3.3",
+        "version": "0.3.5",
         "news": {
             "0.2.0": {
                 "en": "Receive recorded tours and statistic data",
