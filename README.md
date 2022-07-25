@@ -9,6 +9,9 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.3.6 (2022-07-25)
+* (basti4557) UserId is again stored after first fetch (has been commentet out in 0.3.5)
+
 ### 0.3.5 (2022-07-24)
 * (basti4557) Fixed that no user id could be fetched.
 * (basti4557) Moving time and total distance now finally works again :)
