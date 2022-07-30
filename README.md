@@ -9,6 +9,9 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.3.7 (2022-07-30)
+* (basti4557) In tours the distance, speed and duration are now handled as floats (not integer).
+
 ### 0.3.6 (2022-07-25)
 * (basti4557) UserId is again stored after first fetch (has been commentet out in 0.3.5)
 

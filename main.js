@@ -98,11 +98,12 @@ async function synchronizeTours(userId) {
                     id: (tourUrl + '').substring(6),
                     date: checkQuerySelector(tour.querySelector('span[class="tw-text-secondary tw-text-sm tw-mb-0"]')).innerHTML,
                     duration: checkQuerySelector(tour.querySelector('span[data-test-id="t_duration_value"]')).innerHTML,
-                    distance: parseFloat(checkQuerySelector(tour.querySelector('span[data-test-id="t_distance_value"]')).innerHTML) + 'km',
-                    speed: parseFloat(checkQuerySelector(tour.querySelector('span[data-test-id="t_speed_value"]')).innerHTML) + ' km/h',
-                    elevationUp: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_up_value"]')).innerHTML) + 'm',
-                    elevationDown: parseInt(checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML) + 'm',
+                    distance: checkQuerySelector(tour.querySelector('span[data-test-id="t_distance_value"]')).innerHTML.split('<')[0] + ' km',
+                    speed: checkQuerySelector(tour.querySelector('span[data-test-id="t_speed_value"]')).innerHTML.split('<')[0] + ' km/h',
+                    elevationUp: checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_up_value"]')).innerHTML.split('<')[0] + 'm',
+                    elevationDown: checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML.split('<')[0] + 'm',
                 }
+
 
                 // Add Map
                 let map = tour.querySelector('div .c-background-image.tw-hidden');
