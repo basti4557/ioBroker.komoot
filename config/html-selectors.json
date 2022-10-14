@@ -1,0 +1,22 @@
+{
+  "tours": "li",
+  "tourUrl": "a[data-test-id=\"tours_list_item_title\"]",
+  "tourInfo": {
+    "name": "a[data-test-id=\"tours_list_item_title\"]",
+    "data": "span[class=\"tw-text-secondary tw-text-sm tw-mb-0\"]",
+    "duration": "span[data-test-id=\"t_duration_value\"]",
+    "distance": "span[data-test-id=\"t_distance_value\"]",
+    "speed": "span[data-test-id=\"t_speed_value\"]",
+    "elevationUp": "span[data-test-id=\"t_elevation_up_value\"]",
+    "elevationDown": "span[data-test-id=\"t_elevation_down_value\"]"
+  },
+  "map": "div .c-background-image.tw-hidden",
+  "distance": "p[class=\"css-14ou7jh\"]",
+  "movingTime": "p[class=\"css-14ou7jh\"]",
+  "followersFollowing": "li",
+  "followerFollowingInfo": {
+    "name": "a[class=\"c-link c-link--inherit tw-font-bold\"]",
+    "id": "a[class=\"c-link c-link--inherit tw-font-bold\"]",
+    "profilePic": "div .c-thumbnail__img"
+  }
+}

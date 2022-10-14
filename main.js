@@ -8,14 +8,17 @@
 
 const utils = require('@iobroker/adapter-core'); // Get common adapter utils
 const jsdom = require("jsdom");
+const fs = require('fs');
 
 const komootApi = require('./lib/komoot-api');
 const adapterName = require('./package.json').name.split('.').pop();
+
+const htmlSelectors = require('./config/html-selectors.json');
+
 let adapter;
 
 let timer = null;
 let stopTimer = null;
-
 
 function startAdapter(options) {
     options = options || {};
@@ -59,6 +62,7 @@ function stop() {
 }
 
 async function main(adapter) {
+    await syncronizeGithubQuerySelectors();
     await startKomootApi();
 }
 
@@ -66,47 +70,75 @@ async function startKomootApi() {
     await checkProperties(adapter);
 
     await komootApi.start('account.komoot.com', adapter);
-    await sleep(2000);
-    let userId = await komootApi.getUserId();
+     await sleep(2000);
+     let userId = await komootApi.getUserId();
 
-    if (userId !== false) {
-        await synchronizeTours(userId);
-        await syncronizeGeneralData(userId);
-        await syncronizeFollowersFollowing(userId, 'followers');
-        await syncronizeFollowersFollowing(userId, 'following');
+     if (userId !== false) {
+         await synchronizeTours(userId);
+         await syncronizeGeneralData(userId);
+         await syncronizeFollowersFollowing(userId, 'followers');
+         await syncronizeFollowersFollowing(userId, 'following');
+     }
+
+     setTimeout(function () {
+         startKomootApi()
+     }, adapter.config.interval);
+}
+
+async function syncronizeGithubQuerySelectors() {
+    // Get actual query selectors because komoot is changing it often, so nobody has to update the whole adapter because of an changed selector.
+    let fileName = 'config/html-selectors.json';
+
+    let content = await komootApi.getGithubUpdates();
+
+    if (content !== false) {
+        if (fs.existsSync('foo.txt')) {
+            adapter.log.debug("Actual content from github update file(" + fileName + "): " + fs.readFileSync(fileName))
+        } else {
+            adapter.log.debug("Update file actually dont exists on filesystem (" + fileName + ")");
+        }
+        adapter.log.debug("Content of from github update file(" + fileName + "): " + content);
+
+        fs.writeFile(fileName, content, function writeJSON(err) {
+            if (err) return adapter.log.error('There was on problem while updating the' + fileName + " file.");
+            adapter.log.info('Writing updated selectors from github to ' + fileName);
+        });
+    } else {
+        adapter.log.warn("Cant reach the github update file. The query selector update has been canceled.")
     }
 
+    // Every day update the file.
     setTimeout(function () {
-        startKomootApi()
-    }, adapter.config.interval);
+        syncronizeGithubQuerySelectors()
+    }, 86400000);
 }
 
 async function synchronizeTours(userId) {
     let domTours = await komootApi.getPage('www.komoot.de', '/user/' + userId + '/tours?type=recorded');
 
     if (domTours !== false) {
-        let tours = domTours.window.document.querySelectorAll('li');
+        let tours = domTours.window.document.querySelectorAll(htmlSelectors.tours);
         let i = 0;
 
         let tourInfos = [];
 
         for (const [counter, tour] of tours.entries()) {
-            let tourUrl = tour.querySelector('a[data-test-id="tours_list_item_title"]');
+            let tourUrl = tour.querySelector(htmlSelectors.tourUrl);
             if (tourUrl !== null) {
                 const tourInfo = {
-                    name: checkQuerySelector(tour.querySelector('a[data-test-id="tours_list_item_title"]')).innerHTML,
+                    name: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.name)).innerHTML,
                     id: (tourUrl + '').substring(6),
-                    date: checkQuerySelector(tour.querySelector('span[class="tw-text-secondary tw-text-sm tw-mb-0"]')).innerHTML,
-                    duration: checkQuerySelector(tour.querySelector('span[data-test-id="t_duration_value"]')).innerHTML,
-                    distance: checkQuerySelector(tour.querySelector('span[data-test-id="t_distance_value"]')).innerHTML.split('<')[0] + ' km',
-                    speed: checkQuerySelector(tour.querySelector('span[data-test-id="t_speed_value"]')).innerHTML.split('<')[0] + ' km/h',
-                    elevationUp: checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_up_value"]')).innerHTML.split('<')[0] + 'm',
-                    elevationDown: checkQuerySelector(tour.querySelector('span[data-test-id="t_elevation_down_value"]')).innerHTML.split('<')[0] + 'm',
+                    date: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.data)).innerHTML,
+                    duration: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.duration)).innerHTML,
+                    distance: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.distance)).innerHTML.split('<')[0] + ' km',
+                    speed: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.speed)).innerHTML.split('<')[0] + ' km/h',
+                    elevationUp: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.elevationUp)).innerHTML.split('<')[0] + 'm',
+                    elevationDown: checkQuerySelector(tour.querySelector(htmlSelectors.tourInfo.elevationDown)).innerHTML.split('<')[0] + 'm',
                 }
 
 
                 // Add Map
-                let map = tour.querySelector('div .c-background-image.tw-hidden');
+                let map = tour.querySelector(htmlSelectors.map);
                 if (map) {
                     let dataSrc = map.getAttribute('data-src');
                     if (dataSrc) {
@@ -188,8 +220,8 @@ async function syncronizeGeneralData(userId) {
     let domGeneral = await komootApi.getPage('www.komoot.de', '/user/' + userId);
 
     if (domGeneral !== false) {
-        let distance = checkQuerySelector(domGeneral.window.document.querySelectorAll('p[class="css-np7gb1"]')[0]);
-        let movingTime = checkQuerySelector(domGeneral.window.document.querySelectorAll('p[class="css-np7gb1"]')[1]);
+        let distance = checkQuerySelector(domGeneral.window.document.querySelectorAll(htmlSelectors.distance)[0]);
+        let movingTime = checkQuerySelector(domGeneral.window.document.querySelectorAll(htmlSelectors.movingTime)[1]);
 
         if (distance.innerHTML !== null && movingTime.innerHTML !== null) {
             distance = filterString(distance.innerHTML);
@@ -217,21 +249,21 @@ async function syncronizeFollowersFollowing(userId, urlSuffix) {
     let domFollowerFollowing = await komootApi.getPage('www.komoot.de', '/user/' + userId + '/' + urlSuffix);
 
     if (domFollowerFollowing !== false) {
-        let followersFollowing = domFollowerFollowing.window.document.querySelectorAll('li');
+        let followersFollowing = domFollowerFollowing.window.document.querySelectorAll(htmlSelectors.followersFollowing);
         let counter = 0;
 
         let followersFollowingInfo = [];
 
         for (const [i, followerFollowing] of followersFollowing.entries()) {
             const followerFollowingInfo = {
-                name: checkQuerySelector(followerFollowing.querySelector('a[class="c-link c-link--inherit tw-font-bold"]')).innerHTML,
-                id: (followerFollowing.querySelector('a[class="c-link c-link--inherit tw-font-bold"]') + '').substring(6),
+                name: checkQuerySelector(followerFollowing.querySelector(htmlSelectors.followerFollowingInfo.name)).innerHTML,
+                id: (followerFollowing.querySelector(htmlSelectors.followerFollowingInfo.id) + '').substring(6),
             };
 
             if (followerFollowingInfo.id !== null && followerFollowingInfo.id !== '') {
 
                 // Add Profile Picture
-                let profilePic = followerFollowing.querySelector('div .c-thumbnail__img');
+                let profilePic = followerFollowing.querySelector(htmlSelectors.followerFollowingInfo.profilePic);
                 if (profilePic) {
                     let dataSrc = profilePic.getAttribute('data-src');
                     if (dataSrc) {

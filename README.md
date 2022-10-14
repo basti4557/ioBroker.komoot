@@ -9,6 +9,10 @@ Receive Komoot Updates like tours and other specific data.
 
 ## Changelog
 
+### 0.4.0 (2022-10-14)
+* (basti4557) Exported queryselectors into a json file
+* (basti4557) Sync of queryselectors with actual list over github. This sould avoid users to update the application every time a query selector changes.
+
 ### 0.3.7 (2022-07-30)
 * (basti4557) In tours the distance, speed and duration are now handled as floats (not integer).
 
