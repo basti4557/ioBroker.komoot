@@ -86,31 +86,37 @@ async function startKomootApi() {
 }
 
 async function syncronizeGithubQuerySelectors() {
-    // Get actual query selectors because komoot is changing it often, so nobody has to update the whole adapter because of an changed selector.
-    let fileName = 'config/html-selectors.json';
+    return new Promise(async (resolve, reject) => {
+        // Get actual query selectors because komoot is changing it often, so nobody has to update the whole adapter because of an changed selector.
+        let fileName = 'config/html-selectors.json';
 
-    let content = await komootApi.getGithubUpdates();
+        let content = await komootApi.getGithubUpdates();
 
-    if (content !== false) {
-        if (fs.existsSync('foo.txt')) {
-            adapter.log.debug("Actual content from github update file(" + fileName + "): " + fs.readFileSync(fileName))
+        if (content !== false) {
+            if (fs.existsSync(fileName)) {
+                adapter.log.debug("Actual content from github update file(" + fileName + "): " + fs.readFileSync(fileName))
+            } else {
+                adapter.log.debug("Update file actually dont exists on filesystem (" + fileName + ")");
+            }
+
+            adapter.log.debug("NEW content from github update file:" + content);
+
+            fs.writeFile(fileName, content, function writeJSON(err) {
+                if (err) return adapter.log.error('There was on problem while updating the' + fileName + " file.");
+                adapter.log.info('Writing updated selectors from github to ' + fileName);
+                resolve();
+            });
         } else {
-            adapter.log.debug("Update file actually dont exists on filesystem (" + fileName + ")");
+            adapter.log.warn("Cant reach the github update file. The query selector update has been canceled.");
+            resolve();
         }
-        adapter.log.debug("Content of from github update file(" + fileName + "): " + content);
 
-        fs.writeFile(fileName, content, function writeJSON(err) {
-            if (err) return adapter.log.error('There was on problem while updating the' + fileName + " file.");
-            adapter.log.info('Writing updated selectors from github to ' + fileName);
-        });
-    } else {
-        adapter.log.warn("Cant reach the github update file. The query selector update has been canceled.")
-    }
+        // Every day update the file.
+        setTimeout(function () {
+            syncronizeGithubQuerySelectors()
+        }, 86400000);
 
-    // Every day update the file.
-    setTimeout(function () {
-        syncronizeGithubQuerySelectors()
-    }, 86400000);
+    });
 }
 
 async function synchronizeTours(userId) {
