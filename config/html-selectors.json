@@ -11,8 +11,8 @@
     "elevationDown": "span[data-test-id=\"t_elevation_down_value\"]"
   },
   "map": "div .c-background-image.tw-hidden",
-  "distance": "p[class=\"css-14ou7jh\"]",
-  "movingTime": "p[class=\"css-14ou7jh\"]",
+  "distance": "p[class=\"css-1sqi9d7\"]",
+  "movingTime": "p[class=\"css-1sqi9d7\"]",
   "followersFollowing": "li",
   "followerFollowingInfo": {
     "name": "a[class=\"c-link c-link--inherit tw-font-bold\"]",
